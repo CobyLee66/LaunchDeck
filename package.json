@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "dist:macos": "bash scripts/dist-macos.sh"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

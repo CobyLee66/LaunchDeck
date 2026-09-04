@@ -5,7 +5,11 @@ node_modules/
 # Build output
 dist/
 dist-ssr/
+dist-app/
 *.local
+
+# AI Agent
+.zcode/
 
 # Tauri / Rust
 src-tauri/target/
