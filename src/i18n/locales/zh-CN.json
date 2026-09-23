@@ -1,0 +1,106 @@
+{
+  "common": {
+    "yes": "是",
+    "no": "否",
+    "confirm": "确定",
+    "cancel": "取消",
+    "running": "运行中",
+    "stopped": "已停止",
+    "loading": "加载中…",
+    "refresh": "刷新",
+    "refreshing": "刷新中…",
+    "loadFailed": "加载失败: {{message}}",
+    "actionFailed": "{{action}}失败: {{message}}"
+  },
+  "lang": {
+    "title": "界面语言",
+    "auto": "跟随系统",
+    "zh": "简体中文",
+    "en": "English"
+  },
+  "actions": {
+    "start": "启动",
+    "stop": "停止",
+    "restart": "重启",
+    "detail": "详情",
+    "delete": "删除"
+  },
+  "filter": {
+    "searchPlaceholder": "搜索 label…",
+    "sourceAll": "来源: 全部",
+    "sourceSystem": "Apple 系统",
+    "sourceThirdparty": "第三方",
+    "statusAll": "状态: 全部",
+    "statusRunning": "运行中",
+    "statusStopped": "已停止",
+    "autorunAll": "自动运行: 全部",
+    "autorunYes": "是",
+    "autorunNo": "否",
+    "favFirst": "收藏优先"
+  },
+  "list": {
+    "title": "Launchd 服务管理",
+    "backups": "备份管理",
+    "colStatus": "状态",
+    "colAutorun": "自动运行",
+    "colDomain": "域",
+    "colOps": "操作",
+    "fav": "收藏",
+    "noMatch": "无匹配服务",
+    "count": "共 {{visible}} / {{total}} 个服务",
+    "delSipTitle": "系统自带服务受 SIP 保护，不可删除",
+    "delTitle": "删除并备份此服务",
+    "delNoPlistTitle": "未找到 plist 文件，无法删除"
+  },
+  "toast": {
+    "startOk": "已启动 {{label}}",
+    "stopOk": "已停止 {{label}}",
+    "restartOk": "已重启 {{label}}",
+    "deleteOk": "已删除 {{label}}（已备份，可在「备份管理」中恢复）",
+    "deleteFailed": "删除 {{label}} 失败: {{message}}",
+    "favSaveFailed": "保存收藏失败: {{message}}"
+  },
+  "confirmDeleteService": {
+    "title": "删除服务",
+    "message": "确定删除服务 {{label}} 吗？\n将停止服务并把 {{path}} 备份到本机，之后可在「备份管理」中恢复。",
+    "confirm": "删除"
+  },
+  "detail": {
+    "back": "← 返回",
+    "basicInfo": "基本信息",
+    "domain": "域",
+    "status": "状态",
+    "lastExit": "上次退出码",
+    "source": "来源",
+    "sourceSystem": "Apple 系统",
+    "sourceThirdparty": "第三方",
+    "plistPath": "plist 路径",
+    "program": "程序",
+    "plistKeys": "plist 字段",
+    "noPlist": "（无 plist 文件）",
+    "noOutput": "（无输出）"
+  },
+  "backup": {
+    "title": "备份管理",
+    "back": "← 返回列表",
+    "clear": "清空备份",
+    "colDomain": "域",
+    "colOriginalPath": "原 plist 路径",
+    "colDeletedAt": "删除时间",
+    "colOps": "操作",
+    "empty": "暂无备份（删除服务时会自动生成）",
+    "count": "共 {{count}} 条备份",
+    "actionRestore": "恢复",
+    "actionDelete": "删除",
+    "actionClear": "清空",
+    "restoreTitle": "恢复备份",
+    "restoreMessage": "将把 {{label}} 的 plist 恢复到原位置：\n{{path}}\n恢复后不会自动启动，可在服务列表中手动启动。",
+    "restoreOk": "已恢复 {{label}}",
+    "deleteTitle": "删除备份",
+    "deleteMessage": "确定删除 {{label}} 的这条备份吗？\n删除后该备份无法恢复。",
+    "deleteOk": "已删除备份 {{label}}",
+    "clearTitle": "清空备份",
+    "clearMessage": "确定清空全部 {{count}} 条备份吗？\n删除后无法恢复。",
+    "clearOk": "已清空全部备份"
+  }
+}

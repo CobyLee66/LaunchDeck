@@ -1,3 +1,4 @@
+use crate::i18n::{self, Lang};
 use crate::models::{BackupInfo, ServiceDetail, ServiceInfo};
 use crate::service::{default_backend, ServiceBackend};
 use std::sync::OnceLock;
@@ -5,6 +6,18 @@ use std::sync::OnceLock;
 fn backend() -> &'static dyn ServiceBackend {
     static BACKEND: OnceLock<Box<dyn ServiceBackend>> = OnceLock::new();
     BACKEND.get_or_init(default_backend).as_ref()
+}
+
+/// 系统原始 locale（如 "zh-CN" / "en-US"），探测失败返回 null。
+#[tauri::command]
+pub fn get_system_locale() -> Option<String> {
+    sys_locale::get_locale()
+}
+
+/// 前端在启动与切换语言时同步后端，使错误文案语言跟随 UI。
+#[tauri::command]
+pub fn set_language(language: String) {
+    i18n::set_lang(Lang::from_code(&language));
 }
 
 #[tauri::command]

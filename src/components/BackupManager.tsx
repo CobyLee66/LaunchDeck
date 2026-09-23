@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   BackupInfo,
   listBackups,
@@ -14,6 +15,8 @@ interface Props {
 
 interface ConfirmState {
   busyKey: string;
+  /** 失败 toast 里的动作名（已翻译） */
+  action: string;
   title: string;
   message: string;
   confirmText: string;
@@ -23,6 +26,7 @@ interface ConfirmState {
 }
 
 export default function BackupManager({ onBack }: Props) {
+  const { t, i18n } = useTranslation();
   const [backups, setBackups] = useState<BackupInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +52,7 @@ export default function BackupManager({ onBack }: Props) {
 
   const doConfirmed = async () => {
     if (!confirm) return;
-    const { busyKey, run, successText, confirmText } = confirm;
+    const { busyKey, run, successText, action } = confirm;
     setConfirm(null);
     setBusy(busyKey);
     try {
@@ -56,7 +60,7 @@ export default function BackupManager({ onBack }: Props) {
       showToast("ok", successText);
       refresh();
     } catch (e) {
-      showToast("err", `${confirmText}失败: ${e}`);
+      showToast("err", t("common.actionFailed", { action, message: String(e) }));
     } finally {
       setBusy(null);
     }
@@ -65,64 +69,71 @@ export default function BackupManager({ onBack }: Props) {
   const askRestore = (b: BackupInfo) =>
     setConfirm({
       busyKey: b.id,
-      title: "恢复备份",
-      message: `将把 ${b.label} 的 plist 恢复到原位置：\n${b.original_path}\n恢复后不会自动启动，可在服务列表中手动启动。`,
-      confirmText: "恢复",
+      action: t("backup.actionRestore"),
+      title: t("backup.restoreTitle"),
+      message: t("backup.restoreMessage", { label: b.label, path: b.original_path }),
+      confirmText: t("backup.actionRestore"),
       danger: false,
-      successText: `已恢复 ${b.label}`,
+      successText: t("backup.restoreOk", { label: b.label }),
       run: () => restoreBackup(b.id),
     });
 
   const askDelete = (b: BackupInfo) =>
     setConfirm({
       busyKey: b.id,
-      title: "删除备份",
-      message: `确定删除 ${b.label} 的这条备份吗？\n删除后该备份无法恢复。`,
-      confirmText: "删除",
+      action: t("backup.actionDelete"),
+      title: t("backup.deleteTitle"),
+      message: t("backup.deleteMessage", { label: b.label }),
+      confirmText: t("backup.actionDelete"),
       danger: true,
-      successText: `已删除备份 ${b.label}`,
+      successText: t("backup.deleteOk", { label: b.label }),
       run: () => deleteBackup(b.id),
     });
 
   const askClear = () =>
     setConfirm({
       busyKey: "clear",
-      title: "清空备份",
-      message: `确定清空全部 ${backups.length} 条备份吗？\n删除后无法恢复。`,
-      confirmText: "清空",
+      action: t("backup.actionClear"),
+      title: t("backup.clearTitle"),
+      message: t("backup.clearMessage", { count: backups.length }),
+      confirmText: t("backup.actionClear"),
       danger: true,
-      successText: "已清空全部备份",
+      successText: t("backup.clearOk"),
       run: () => clearBackups(),
     });
+
+  // 日期格式跟随当前界面语言
+  const formatTime = (ms: number) =>
+    new Date(ms).toLocaleString(i18n.language === "zh-CN" ? "zh-CN" : "en-US");
 
   return (
     <div className="page">
       <div className="page-head">
-        <h1>备份管理</h1>
+        <h1>{t("backup.title")}</h1>
         <div className="ops" style={{ marginTop: 0 }}>
           <button className="btn" onClick={onBack}>
-            ← 返回列表
+            {t("backup.back")}
           </button>
           <button
             className="btn danger"
             disabled={loading || backups.length === 0 || busy !== null}
             onClick={askClear}
           >
-            清空备份
+            {t("backup.clear")}
           </button>
         </div>
       </div>
       {toast && <div className={`toast ${toast.kind}`}>{toast.text}</div>}
-      {error && <div className="toast err">加载失败: {error}</div>}
+      {error && <div className="toast err">{t("common.loadFailed", { message: error })}</div>}
       <div className="table-wrap">
         <table>
           <thead>
             <tr>
               <th>Label</th>
-              <th style={{ width: 60 }}>域</th>
-              <th>原 plist 路径</th>
-              <th style={{ width: 160 }}>删除时间</th>
-              <th style={{ width: 130 }}>操作</th>
+              <th style={{ width: 60 }}>{t("backup.colDomain")}</th>
+              <th>{t("backup.colOriginalPath")}</th>
+              <th style={{ width: 160 }}>{t("backup.colDeletedAt")}</th>
+              <th style={{ width: 130 }}>{t("backup.colOps")}</th>
             </tr>
           </thead>
           <tbody>
@@ -133,18 +144,18 @@ export default function BackupManager({ onBack }: Props) {
                 <td className="mono" title={b.original_path}>
                   {b.original_path}
                 </td>
-                <td>{new Date(b.deleted_at_ms).toLocaleString()}</td>
+                <td>{formatTime(b.deleted_at_ms)}</td>
                 <td>
                   <div className="ops" style={{ marginTop: 0 }}>
                     <button className="btn" disabled={busy !== null} onClick={() => askRestore(b)}>
-                      恢复
+                      {t("backup.actionRestore")}
                     </button>
                     <button
                       className="btn danger"
                       disabled={busy !== null}
                       onClick={() => askDelete(b)}
                     >
-                      删除
+                      {t("backup.actionDelete")}
                     </button>
                   </div>
                 </td>
@@ -153,14 +164,16 @@ export default function BackupManager({ onBack }: Props) {
             {!loading && backups.length === 0 && (
               <tr>
                 <td colSpan={5} className="empty">
-                  暂无备份（删除服务时会自动生成）
+                  {t("backup.empty")}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
-      <div className="footer">{loading ? "加载中…" : `共 ${backups.length} 条备份`}</div>
+      <div className="footer">
+        {loading ? t("common.loading") : t("backup.count", { count: backups.length })}
+      </div>
       {confirm && (
         <ConfirmModal
           title={confirm.title}

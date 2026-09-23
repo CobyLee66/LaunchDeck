@@ -1,7 +1,7 @@
 {
   "name": "sysservicehelper",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,8 +12,10 @@
   "dependencies": {
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-store": "^2",
+    "i18next": "^26.4.2",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-i18next": "^17.0.15"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",

@@ -1,0 +1,106 @@
+{
+  "common": {
+    "yes": "Yes",
+    "no": "No",
+    "confirm": "OK",
+    "cancel": "Cancel",
+    "running": "Running",
+    "stopped": "Stopped",
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing…",
+    "loadFailed": "Failed to load: {{message}}",
+    "actionFailed": "{{action}} failed: {{message}}"
+  },
+  "lang": {
+    "title": "Interface language",
+    "auto": "Auto (system)",
+    "zh": "简体中文",
+    "en": "English"
+  },
+  "actions": {
+    "start": "Start",
+    "stop": "Stop",
+    "restart": "Restart",
+    "detail": "Details",
+    "delete": "Delete"
+  },
+  "filter": {
+    "searchPlaceholder": "Search label…",
+    "sourceAll": "Source: All",
+    "sourceSystem": "Apple system",
+    "sourceThirdparty": "Third-party",
+    "statusAll": "Status: All",
+    "statusRunning": "Running",
+    "statusStopped": "Stopped",
+    "autorunAll": "Auto-run: All",
+    "autorunYes": "Yes",
+    "autorunNo": "No",
+    "favFirst": "Favorites first"
+  },
+  "list": {
+    "title": "Launchd Service Manager",
+    "backups": "Backups",
+    "colStatus": "Status",
+    "colAutorun": "Auto-run",
+    "colDomain": "Domain",
+    "colOps": "Actions",
+    "fav": "Favorite",
+    "noMatch": "No matching services",
+    "count": "{{visible}} / {{total}} services",
+    "delSipTitle": "Built-in system services are protected by SIP and cannot be deleted",
+    "delTitle": "Delete and back up this service",
+    "delNoPlistTitle": "plist file not found, cannot delete"
+  },
+  "toast": {
+    "startOk": "Started {{label}}",
+    "stopOk": "Stopped {{label}}",
+    "restartOk": "Restarted {{label}}",
+    "deleteOk": "Deleted {{label}} (backed up; restore it from Backups)",
+    "deleteFailed": "Failed to delete {{label}}: {{message}}",
+    "favSaveFailed": "Failed to save favorite: {{message}}"
+  },
+  "confirmDeleteService": {
+    "title": "Delete Service",
+    "message": "Delete service {{label}}?\nThe service will be stopped and {{path}} backed up locally; you can restore it from Backups.",
+    "confirm": "Delete"
+  },
+  "detail": {
+    "back": "← Back",
+    "basicInfo": "Basic Info",
+    "domain": "Domain",
+    "status": "Status",
+    "lastExit": "Last exit code",
+    "source": "Source",
+    "sourceSystem": "Apple system",
+    "sourceThirdparty": "Third-party",
+    "plistPath": "plist path",
+    "program": "Program",
+    "plistKeys": "plist keys",
+    "noPlist": "(no plist file)",
+    "noOutput": "(no output)"
+  },
+  "backup": {
+    "title": "Backup Manager",
+    "back": "← Back to list",
+    "clear": "Clear backups",
+    "colDomain": "Domain",
+    "colOriginalPath": "Original plist path",
+    "colDeletedAt": "Deleted at",
+    "colOps": "Actions",
+    "empty": "No backups yet (created automatically when deleting services)",
+    "count": "{{count}} backups",
+    "actionRestore": "Restore",
+    "actionDelete": "Delete",
+    "actionClear": "Clear",
+    "restoreTitle": "Restore Backup",
+    "restoreMessage": "The plist of {{label}} will be restored to its original location:\n{{path}}\nIt will not start automatically; start it manually from the service list.",
+    "restoreOk": "Restored {{label}}",
+    "deleteTitle": "Delete Backup",
+    "deleteMessage": "Delete this backup of {{label}}?\nIt cannot be recovered after deletion.",
+    "deleteOk": "Deleted backup of {{label}}",
+    "clearTitle": "Clear Backups",
+    "clearMessage": "Delete all {{count}} backups?\nThey cannot be recovered after deletion.",
+    "clearOk": "All backups cleared"
+  }
+}

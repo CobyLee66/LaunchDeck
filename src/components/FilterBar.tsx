@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 export interface Filters {
   search: string;
   source: "all" | "system" | "thirdparty";
@@ -14,29 +16,30 @@ interface Props {
 }
 
 export default function FilterBar({ filters, onChange, onRefresh, loading }: Props) {
+  const { t } = useTranslation();
   const set = <K extends keyof Filters>(k: K, v: Filters[K]) => onChange({ ...filters, [k]: v });
   return (
     <div className="filter-bar">
       <input
         className="search"
-        placeholder="搜索 label…"
+        placeholder={t("filter.searchPlaceholder")}
         value={filters.search}
         onChange={(e) => set("search", e.target.value)}
       />
       <select value={filters.source} onChange={(e) => set("source", e.target.value as Filters["source"])}>
-        <option value="all">来源: 全部</option>
-        <option value="system">Apple 系统</option>
-        <option value="thirdparty">第三方</option>
+        <option value="all">{t("filter.sourceAll")}</option>
+        <option value="system">{t("filter.sourceSystem")}</option>
+        <option value="thirdparty">{t("filter.sourceThirdparty")}</option>
       </select>
       <select value={filters.status} onChange={(e) => set("status", e.target.value as Filters["status"])}>
-        <option value="all">状态: 全部</option>
-        <option value="running">运行中</option>
-        <option value="stopped">已停止</option>
+        <option value="all">{t("filter.statusAll")}</option>
+        <option value="running">{t("filter.statusRunning")}</option>
+        <option value="stopped">{t("filter.statusStopped")}</option>
       </select>
       <select value={filters.autorun} onChange={(e) => set("autorun", e.target.value as Filters["autorun"])}>
-        <option value="all">自动运行: 全部</option>
-        <option value="yes">是</option>
-        <option value="no">否</option>
+        <option value="all">{t("filter.autorunAll")}</option>
+        <option value="yes">{t("filter.autorunYes")}</option>
+        <option value="no">{t("filter.autorunNo")}</option>
       </select>
       <label className="chk">
         <input
@@ -44,10 +47,10 @@ export default function FilterBar({ filters, onChange, onRefresh, loading }: Pro
           checked={filters.favFirst}
           onChange={(e) => set("favFirst", e.target.checked)}
         />
-        收藏优先
+        {t("filter.favFirst")}
       </label>
       <button className="btn" onClick={onRefresh} disabled={loading}>
-        {loading ? "刷新中…" : "刷新"}
+        {loading ? t("common.refreshing") : t("common.refresh")}
       </button>
     </div>
   );

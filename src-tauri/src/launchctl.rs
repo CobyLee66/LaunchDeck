@@ -1,3 +1,4 @@
+use crate::i18n;
 use crate::models::{BackupInfo, ServiceDetail, ServiceInfo};
 use crate::service::ServiceBackend;
 use std::collections::HashMap;
@@ -25,7 +26,7 @@ fn run_cmd(program: &str, args: &[&str]) -> Result<String, String> {
     let out = Command::new(program)
         .args(args)
         .output()
-        .map_err(|e| format!("执行 {} 失败: {}", program, e))?;
+        .map_err(|e| i18n::run_cmd_failed(program, e))?;
     if out.status.success() {
         Ok(String::from_utf8_lossy(&out.stdout).to_string())
     } else {
@@ -288,7 +289,7 @@ fn now_ms() -> u64 {
 
 /// 备份根目录：~/Library/Application Support/SysServiceHelper/backups
 fn backup_root() -> Result<PathBuf, String> {
-    let home = std::env::var("HOME").map_err(|_| "无法获取 HOME 目录".to_string())?;
+    let home = std::env::var("HOME").map_err(|_| i18n::home_not_found())?;
     Ok(Path::new(&home).join("Library/Application Support/SysServiceHelper/backups"))
 }
 
@@ -310,7 +311,7 @@ fn sanitize_label(label: &str) -> String {
 /// id 是备份子目录名，拒绝路径分隔符与 .. 防止路径穿越
 fn validate_backup_id(id: &str) -> Result<(), String> {
     if id.is_empty() || id == "." || id == ".." || id.contains('/') || id.contains('\\') {
-        return Err(format!("非法的备份 id: {}", id));
+        return Err(i18n::invalid_backup_id(id));
     }
     Ok(())
 }
@@ -334,8 +335,8 @@ fn read_backup(dir: &Path) -> Option<BackupInfo> {
 }
 
 fn write_meta(dir: &Path, info: &BackupInfo) -> Result<(), String> {
-    let json = serde_json::to_string_pretty(info).map_err(|e| format!("序列化备份信息失败: {}", e))?;
-    std::fs::write(dir.join("meta.json"), json).map_err(|e| format!("写入备份信息失败: {}", e))
+    let json = serde_json::to_string_pretty(info).map_err(i18n::serialize_meta_failed)?;
+    std::fs::write(dir.join("meta.json"), json).map_err(i18n::write_meta_failed)
 }
 
 /// 以下 *_at(root, …) 自由函数接受显式备份根目录，便于单元测试指向临时目录。
@@ -351,22 +352,20 @@ fn backup_create_at(
 ) -> Result<BackupInfo, String> {
     let src = Path::new(plist_path);
     if !src.is_file() {
-        return Err(format!("plist 文件不存在: {}", plist_path));
+        return Err(i18n::plist_not_found(plist_path));
     }
-    std::fs::create_dir_all(root).map_err(|e| format!("创建备份目录失败: {}", e))?;
+    std::fs::create_dir_all(root).map_err(i18n::create_backup_dir_failed)?;
 
     let dir_name = unique_dir_name(root, &format!("{}-{}", deleted_at_ms, sanitize_label(label)));
     let dir = root.join(&dir_name);
-    std::fs::create_dir(&dir).map_err(|e| format!("创建备份目录失败: {}", e))?;
+    std::fs::create_dir(&dir).map_err(i18n::create_backup_dir_failed)?;
 
     let cleanup = |e: String| -> String {
         let _ = std::fs::remove_dir_all(&dir);
         e
     };
     let file_name = "service.plist".to_string();
-    std::fs::copy(src, dir.join(&file_name)).map_err(|e| {
-        cleanup(format!("备份 plist 失败: {}", e))
-    })?;
+    std::fs::copy(src, dir.join(&file_name)).map_err(|e| cleanup(i18n::backup_plist_failed(e)))?;
     let info = BackupInfo {
         id: dir_name,
         label: label.to_string(),
@@ -399,13 +398,13 @@ fn backup_list_at(root: &Path) -> Result<Vec<BackupInfo>, String> {
 fn backup_read_at(root: &Path, backup_id: &str) -> Result<(PathBuf, BackupInfo), String> {
     validate_backup_id(backup_id)?;
     let dir = root.join(backup_id);
-    let info = read_backup(&dir).ok_or_else(|| format!("备份 {} 不存在或已损坏", backup_id))?;
+    let info = read_backup(&dir).ok_or_else(|| i18n::backup_not_found(backup_id))?;
     Ok((dir, info))
 }
 
 fn backup_delete_at(root: &Path, backup_id: &str) -> Result<(), String> {
     let (dir, _) = backup_read_at(root, backup_id)?;
-    std::fs::remove_dir_all(&dir).map_err(|e| format!("删除备份失败: {}", e))
+    std::fs::remove_dir_all(&dir).map_err(i18n::delete_backup_failed)
 }
 
 fn backup_clear_at(root: &Path) -> Result<(), String> {
@@ -417,8 +416,7 @@ fn backup_clear_at(root: &Path) -> Result<(), String> {
         let path = entry.path();
         if path.is_dir() {
             let name = entry.file_name().to_string_lossy().to_string();
-            std::fs::remove_dir_all(&path)
-                .map_err(|e| format!("清空备份失败（{}）: {}", name, e))?;
+            std::fs::remove_dir_all(&path).map_err(|e| i18n::clear_backup_failed(&name, e))?;
         }
     }
     Ok(())
@@ -427,7 +425,7 @@ fn backup_clear_at(root: &Path) -> Result<(), String> {
 /// 把备份的 plist 复制回原路径。/Library 下需 root 提权，其余按当前用户权限复制。
 fn backup_copy_back(src: &Path, original_path: &str) -> Result<(), String> {
     if let Some(parent) = Path::new(original_path).parent() {
-        std::fs::create_dir_all(parent).map_err(|e| format!("创建目录失败: {}", e))?;
+        std::fs::create_dir_all(parent).map_err(i18n::create_dir_failed)?;
     }
     if original_path.starts_with("/Library/") {
         // 提权复制，文件归属 root，与常规 LaunchDaemon/LaunchAgent 的属主一致
@@ -437,8 +435,7 @@ fn backup_copy_back(src: &Path, original_path: &str) -> Result<(), String> {
             shell_quote(original_path)
         ))
     } else {
-        std::fs::copy(src, original_path)
-            .map_err(|e| format!("恢复 plist 失败: {}", e))?;
+        std::fs::copy(src, original_path).map_err(i18n::restore_plist_failed)?;
         Ok(())
     }
 }
@@ -451,13 +448,13 @@ impl ServiceBackend for LaunchctlBackend {
     fn detail(&self, domain: &str, label: &str) -> Result<ServiceDetail, String> {
         let target = expand_target(&format!("{}/{}", domain, label));
         let raw_print = run_cmd("launchctl", &["print", &target])
-            .unwrap_or_else(|e| format!("（launchctl print 失败: {}）", e));
+            .unwrap_or_else(|e| i18n::print_failed(e));
 
         let info = self
             .collect()?
             .into_iter()
             .find(|s| s.domain == domain && s.label == label)
-            .ok_or_else(|| format!("服务 {} 不存在", label))?;
+            .ok_or_else(|| i18n::service_not_found(label))?;
 
         let plist_keys = match &info.plist_path {
             Some(p) => match plist::Value::from_file(p) {
@@ -492,7 +489,7 @@ impl ServiceBackend for LaunchctlBackend {
             };
             self.run_write(domain, &["bootstrap".into(), full_domain, path.to_string()])
         } else {
-            Err(format!("服务 {} 未加载且无 plist 路径，无法启动", label))
+            Err(i18n::start_not_loaded(label))
         }
     }
 
@@ -520,13 +517,13 @@ impl ServiceBackend for LaunchctlBackend {
             };
             self.run_write(domain, &["bootstrap".into(), full_domain, path.to_string()])
         } else {
-            Err(format!("服务 {} 未加载且无 plist 路径，无法重启", label))
+            Err(i18n::restart_not_loaded(label))
         }
     }
 
     fn delete_service(&self, domain: &str, label: &str, plist_path: &str) -> Result<(), String> {
         if plist_path.starts_with("/System/Library") {
-            return Err("系统自带服务受 SIP 保护，无法删除".to_string());
+            return Err(i18n::sip_protected().to_string());
         }
 
         // 已加载的服务先卸载并等待状态收敛；卸载失败（如取消管理员授权）则中止
@@ -542,14 +539,9 @@ impl ServiceBackend for LaunchctlBackend {
         let result = if plist_path.starts_with("/Library/") {
             privileged_shell(&format!("rm -f {}", shell_quote(plist_path)))
         } else {
-            std::fs::remove_file(plist_path).map_err(|e| format!("删除 plist 失败: {}", e))
+            std::fs::remove_file(plist_path).map_err(i18n::delete_plist_failed)
         };
-        result.map_err(|e| {
-            format!(
-                "已备份到 {}，但删除原文件失败: {}",
-                info.id, e
-            )
-        })
+        result.map_err(|e| i18n::backup_but_delete_failed(&info.id, e))
     }
 
     fn list_backups(&self) -> Result<Vec<BackupInfo>, String> {
@@ -561,7 +553,7 @@ impl ServiceBackend for LaunchctlBackend {
         let (dir, info) = backup_read_at(&root, backup_id)?;
         let src = dir.join(&info.file_name);
         if !src.is_file() {
-            return Err(format!("备份文件缺失: {}", src.display()));
+            return Err(i18n::backup_file_missing(&src.display().to_string()));
         }
 
         // 同名服务已加载则先卸载，避免覆盖运行中服务的 plist

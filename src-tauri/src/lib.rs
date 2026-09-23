@@ -1,4 +1,5 @@
 mod commands;
+mod i18n;
 mod launchctl;
 mod models;
 mod service;
@@ -18,6 +19,8 @@ pub fn run() {
             commands::restore_backup,
             commands::delete_backup,
             commands::clear_backups,
+            commands::get_system_locale,
+            commands::set_language,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -67,3 +67,11 @@ export function deleteBackup(backupId: string): Promise<void> {
 export function clearBackups(): Promise<void> {
   return invoke("clear_backups");
 }
+
+export function getSystemLocale(): Promise<string | null> {
+  return invoke<string | null>("get_system_locale");
+}
+
+export function setLanguage(language: string): Promise<void> {
+  return invoke("set_language", { language });
+}

@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 interface Props {
   title: string;
   message: string;
@@ -11,11 +13,12 @@ interface Props {
 export default function ConfirmModal({
   title,
   message,
-  confirmText = "确定",
+  confirmText,
   danger = false,
   onConfirm,
   onCancel,
 }: Props) {
+  const { t } = useTranslation();
   return (
     <div className="modal-overlay" onClick={onCancel}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -23,10 +26,10 @@ export default function ConfirmModal({
         <p>{message}</p>
         <div className="modal-actions">
           <button className="btn" onClick={onCancel}>
-            取消
+            {t("common.cancel")}
           </button>
           <button className={`btn ${danger ? "danger" : "primary"}`} onClick={onConfirm}>
-            {confirmText}
+            {confirmText ?? t("common.confirm")}
           </button>
         </div>
       </div>
