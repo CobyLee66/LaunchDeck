@@ -287,10 +287,10 @@ fn now_ms() -> u64 {
         .unwrap_or(0)
 }
 
-/// 备份根目录：~/Library/Application Support/SysServiceHelper/backups
+/// 备份根目录：~/Library/Application Support/LaunchDeck/backups
 fn backup_root() -> Result<PathBuf, String> {
     let home = std::env::var("HOME").map_err(|_| i18n::home_not_found())?;
-    Ok(Path::new(&home).join("Library/Application Support/SysServiceHelper/backups"))
+    Ok(Path::new(&home).join("Library/Application Support/LaunchDeck/backups"))
 }
 
 /// 备份目录名里的 label 消毒：launchd label 通常为反向域名（字母数字点），

@@ -1,11 +1,11 @@
 <div align="center">
 
-# SysServiceHelper
+# LaunchDeck
 
 **轻量级 macOS launchd 服务管理工具 —— 用一个干净、快速的本地图形界面，扫描、查看并管理 LaunchDaemons / LaunchAgents。**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Release](https://img.shields.io/github/v/release/CobyLee66/SysServiceHelper)](https://github.com/CobyLee66/SysServiceHelper/releases)
+[![Release](https://img.shields.io/github/v/release/CobyLee66/LaunchDeck)](https://github.com/CobyLee66/LaunchDeck/releases)
 ![Platform](https://img.shields.io/badge/platform-macOS%2011%2B%20Apple%20Silicon-lightgrey)
 [![Built with Tauri](https://img.shields.io/badge/built%20with-Tauri%202-24C8DB?logo=tauri)](https://tauri.app)
 
@@ -15,7 +15,7 @@
 
 ---
 
-macOS 没有自带 launchd 服务的管理界面——`launchctl` 功能强大但对普通用户不友好，散落在 LaunchDaemons / LaunchAgents 各目录里的第三方服务更是难以追踪。SysServiceHelper 把这些装进一个窗口：看清 Mac 上的每一个服务、谁在运行、谁会自启动，并可以直接启动 / 停止 / 重启 / 安全删除。
+macOS 没有自带 launchd 服务的管理界面——`launchctl` 功能强大但对普通用户不友好，散落在 LaunchDaemons / LaunchAgents 各目录里的第三方服务更是难以追踪。LaunchDeck 把这些装进一个窗口：看清 Mac 上的每一个服务、谁在运行、谁会自启动，并可以直接启动 / 停止 / 重启 / 安全删除。
 
 基于 **Tauri 2 + React + Rust** 构建：安装包小、常驻资源占用近乎为零，所有平台逻辑收敛在 Rust 后端。
 
@@ -41,7 +41,7 @@ macOS 没有自带 launchd 服务的管理界面——`launchctl` 功能强大�
 
 - 应用以普通用户身份运行，用户域操作无需提权。
 - 写入 **system 域**（`/Library/LaunchDaemons` 下的服务）时会弹出标准的 macOS 管理员授权对话框（经 `osascript`），系统对同一应用的授权有几分钟缓存。
-- **删除必先备份**：plist 被复制到 `~/Library/Application Support/SysServiceHelper/backups/<时间戳>-<标签>/`（附 `meta.json`），复制成功才删除原文件；备份不完整会自动回滚。
+- **删除必先备份**：plist 被复制到 `~/Library/Application Support/LaunchDeck/backups/<时间戳>-<标签>/`（附 `meta.json`），复制成功才删除原文件；备份不完整会自动回滚。
 - 恢复备份到 `/Library` 时走提权复制以保留 root 属主，且拒绝覆盖当前已加载服务的 plist。
 - 备份 ID 做路径穿越校验；一切都在本机完成——不联网、无遥测。
 
@@ -52,12 +52,12 @@ macOS 没有自带 launchd 服务的管理界面——`launchctl` 功能强大�
 
 ## 安装
 
-1. 从 [最新 Release](https://github.com/CobyLee66/SysServiceHelper/releases) 下载 `SysServiceHelper_<版本>_aarch64.zip`；
-2. 解压，把 `SysServiceHelper.app` 拖入「应用程序」；
+1. 从 [最新 Release](https://github.com/CobyLee66/LaunchDeck/releases) 下载 `LaunchDeck_<版本>_arm64.zip`；
+2. 解压，把 `LaunchDeck.app` 拖入「应用程序」；
 3. 首次打开——应用为 ad-hoc 签名、未做 Apple 公证（无付费开发者账号），macOS 会拦截一次。在终端执行：
 
    ```bash
-   xattr -cr /Applications/SysServiceHelper.app
+   xattr -cr /Applications/LaunchDeck.app
    ```
 
    或者双击打开后，在「系统设置 → 隐私与安全性」里点「仍要打开」；

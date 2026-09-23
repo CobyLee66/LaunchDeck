@@ -5,7 +5,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-APP_NAME="SysServiceHelper"
+APP_NAME="LaunchDeck"
 VERSION=$(node -p "require('./package.json').version")
 ARCH=$(uname -m)
 APP_PATH="src-tauri/target/release/bundle/macos/${APP_NAME}.app"

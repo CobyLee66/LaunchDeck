@@ -1,5 +1,5 @@
 [package]
-name = "sysservicehelper"
+name = "launchdeck"
 version = "0.3.0"
 edition = "2021"
 

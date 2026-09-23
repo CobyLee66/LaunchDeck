@@ -18,3 +18,4 @@
 | D007 | i18n：前端用 i18next + react-i18next（资源 JSON 内联打包）；语言偏好存 plugin-store `settings.json` 的 `language` 键（auto/zh-CN/en，默认 auto=经 `get_system_locale` 命令探测系统语言）；列表页提供手动切换。系统 locale 仅简体中文（zh-Hans*/zh-CN/zh-SG）映射中文，其余一律英文 | 两份字典（zh-CN/en）必须同步维护；缺失键回退英文；检测/偏好持久化失败都不阻塞 UI（回退 auto→英文） | 2026-09-23 |
 | D008 | 后端用户可见错误文案（约 23 条）在 Rust 侧查表翻译（`src-tauri/src/i18n.rs`，模块级语言由前端启动/切换时调 `set_language` 命令同步），不引入错误码协议、不改 `ServiceBackend` trait 签名 | launchctl/osascript 的原始 stderr 与 `raw_print` 输出是外部工具结果，保持原文不翻译；该规模下错误码改造成本不成比例 | 2026-09-23 |
 | D009 | 项目以 MIT License 开源（GitHub 仓库 public）；提交作者邮箱保留现状不重写历史；README 采用英文主文档 + `README.zh-CN.md` 双语结构 | 开源不可无 LICENSE（默认保留所有权利）；不为隐私顾虑改写 git 历史（哈希全变、协作成本不成比例） | 2026-09-23 |
+| D010 | 更名 SysServiceHelper → LaunchDeck：原名太泛、与 launchd 服务管理功能不搭；新名「控制甲板」隐喻直指功能，搜索无冲突（避开 LaunchControl/Lingon），且利于品牌化（图标/周边） | 名称须一眼关联 launchd 服务管理；不与该领域现有工具（LaunchControl、Lingon X）撞名 | 2026-09-23 |

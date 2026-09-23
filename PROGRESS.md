@@ -13,6 +13,8 @@
 
 ### 最近完成
 
+- [x] 项目更名 SysServiceHelper → LaunchDeck（2026-09-23，v0.3.0，D010）— 全套更名：GitHub 仓库 rename（旧名自动重定向）、productName/identifier（`com.cobylee66.launchdeck`，不再以 .app 结尾消除 tauri build 警告）、Cargo 包名、窗口标题、index.html title、dist 脚本 APP_NAME、双语 README；本机数据目录已手工迁移（备份 `~/Library/Application Support/SysServiceHelper` → `LaunchDeck`，设置 `com.sysservicehelper.app` → `com.cobylee66.launchdeck`，保留收藏与语言偏好）。⚠ 踩坑：(1) identifier 变更会让 plugin-store 设置目录跟着变（settings.json 按 identifier 归档），改 identifier 必须同步迁移旧目录否则收藏/语言全丢；(2) README 分发包文件名按 `uname -m` 写 `arm64` 不是 `aarch64`（dist 脚本用 `uname -m`），两者别混用
+
 - [x] 开源准备：GitHub 仓库公开（2026-09-23，v0.3.0，D009）— 全仓安全审计（工作区 + 4 个历史提交：无密钥/证书/.env/绝对路径泄露，dist 脚本仅 ad-hoc 签名，gitignore 覆盖完整）；新增 MIT LICENSE、README.md（英文主文档）+ README.zh-CN.md 双语开源介绍（保留原构建/分发/Gatekeeper 内容）；仓库 CobyLee66/SysServiceHelper 设为 public 并补描述与 topics。⚠ 踩坑：(1) 提交作者邮箱随公开对外可见，且历史提交早已推到远程——转 public 前是用 git filter-repo 重写历史的最后窗口，之后强推会分裂所有克隆；(2) 工作区有未提交改动时（i18n 新模块）公开仓库，远端代码会引用不存在的文件而编译不过——公开前必须先构建验证再提交
 
 - [x] 多语言支持 i18n：简体中文 + 英文，按系统语言自动切换（2026-09-23，v0.3.0，D007/D008）— 前端 i18next + react-i18next（`src/i18n/`，字典 `locales/zh-CN.json`/`en.json` 约 100 键），语言偏好存 settings.json `language` 键（auto/zh-CN/en），列表页工具栏新增语言下拉；后端新增 `sys-locale` + `src-tauri/src/i18n.rs` 查表（约 23 条错误文案），`get_system_locale`/`set_language` 两个新命令做前后端语言同步。⚠ 踩坑：(1) sys-locale 返回的 locale 分隔符可能是 `_`（如 zh_Hans_CN），匹配前必须归一为 `-` 再前缀匹配；(2) 后端错误经 `Result<_, String>` 原样透传到 toast，前端字典翻译不了它——后端必须同样 i18n，且前端在启动与手动切换时都要调 `set_language`，否则后端文案停留在系统语言；(3) 字典资源内联时 i18next init 同步完成，但偏好读取 + locale 探测是异步的，main.tsx 改为 `initLanguage().finally(render)` 先定语言再渲染，避免首帧闪烁；版本号这次三处同步（tauri.conf.json / package.json / Cargo.toml）

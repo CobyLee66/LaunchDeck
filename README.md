@@ -1,11 +1,11 @@
 <div align="center">
 
-# SysServiceHelper
+# LaunchDeck
 
 **A lightweight macOS launchd service manager — scan, inspect, and control LaunchDaemons / LaunchAgents from a clean, fast native GUI.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Release](https://img.shields.io/github/v/release/CobyLee66/SysServiceHelper)](https://github.com/CobyLee66/SysServiceHelper/releases)
+[![Release](https://img.shields.io/github/v/release/CobyLee66/LaunchDeck)](https://github.com/CobyLee66/LaunchDeck/releases)
 ![Platform](https://img.shields.io/badge/platform-macOS%2011%2B%20Apple%20Silicon-lightgrey)
 [![Built with Tauri](https://img.shields.io/badge/built%20with-Tauri%202-24C8DB?logo=tauri)](https://tauri.app)
 
@@ -15,7 +15,7 @@ English | [简体中文](README.zh-CN.md)
 
 ---
 
-macOS has no built-in GUI for managing launchd services — `launchctl` is powerful but unfriendly, and third-party services scattered across LaunchDaemons / LaunchAgents directories are hard to keep track of. SysServiceHelper gives you a single window to see every service on your Mac, what's running, what auto-starts, and full control to start / stop / restart / safely delete them.
+macOS has no built-in GUI for managing launchd services — `launchctl` is powerful but unfriendly, and third-party services scattered across LaunchDaemons / LaunchAgents directories are hard to keep track of. LaunchDeck gives you a single window to see every service on your Mac, what's running, what auto-starts, and full control to start / stop / restart / safely delete them.
 
 Built with **Tauri 2 + React + Rust**: a tiny bundle, near-zero idle footprint, and all platform logic behind a Rust-side backend.
 
@@ -41,7 +41,7 @@ Built with **Tauri 2 + React + Rust**: a tiny bundle, near-zero idle footprint, 
 
 - The app runs as a normal user application. Operations on your own user domain need no elevation.
 - Writing to the **system domain** (services in `/Library/LaunchDaemons`) triggers the standard macOS administrator authorization dialog (via `osascript`); authorization is cached by the system for a few minutes.
-- **Delete is backup-first**: the plist is copied to `~/Library/Application Support/SysServiceHelper/backups/<timestamp>-<label>/` together with a `meta.json`; only after the copy succeeds is the original file removed. Incomplete backups are rolled back automatically.
+- **Delete is backup-first**: the plist is copied to `~/Library/Application Support/LaunchDeck/backups/<timestamp>-<label>/` together with a `meta.json`; only after the copy succeeds is the original file removed. Incomplete backups are rolled back automatically.
 - Restoring a backup to `/Library` uses an elevated copy to preserve root ownership, and refuses to overwrite the plist of a currently loaded service.
 - Backup IDs are validated against path traversal; everything stays on your machine — no network, no telemetry.
 
@@ -52,12 +52,12 @@ Built with **Tauri 2 + React + Rust**: a tiny bundle, near-zero idle footprint, 
 
 ## Install
 
-1. Download `SysServiceHelper_<version>_aarch64.zip` from the [latest release](https://github.com/CobyLee66/SysServiceHelper/releases).
-2. Unzip and drag `SysServiceHelper.app` into **Applications**.
+1. Download `LaunchDeck_<version>_arm64.zip` from the [latest release](https://github.com/CobyLee66/LaunchDeck/releases).
+2. Unzip and drag `LaunchDeck.app` into **Applications**.
 3. First launch — the app is ad-hoc signed and not notarized (no paid Apple Developer account), so macOS blocks it once. Either run:
 
    ```bash
-   xattr -cr /Applications/SysServiceHelper.app
+   xattr -cr /Applications/LaunchDeck.app
    ```
 
    or double-click the app and click **Open Anyway** in *System Settings → Privacy & Security*.

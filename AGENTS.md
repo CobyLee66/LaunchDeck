@@ -1,4 +1,4 @@
-# SysServiceHelper 项目规范
+# LaunchDeck 项目规范
 
 ## 项目
 
