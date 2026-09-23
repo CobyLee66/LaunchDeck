@@ -5,13 +5,17 @@
 
 ---
 
-## 当前状态（截至 2026-09-23，version 0.2.0）
+## 当前状态（截至 2026-09-23，version 0.3.0）
 
 ### 进行中
 
 - （当前无进行中事项）
 
 ### 最近完成
+
+- [x] 开源准备：GitHub 仓库公开（2026-09-23，v0.3.0，D009）— 全仓安全审计（工作区 + 4 个历史提交：无密钥/证书/.env/绝对路径泄露，dist 脚本仅 ad-hoc 签名，gitignore 覆盖完整）；新增 MIT LICENSE、README.md（英文主文档）+ README.zh-CN.md 双语开源介绍（保留原构建/分发/Gatekeeper 内容）；仓库 CobyLee66/SysServiceHelper 设为 public 并补描述与 topics。⚠ 踩坑：(1) 提交作者邮箱随公开对外可见，且历史提交早已推到远程——转 public 前是用 git filter-repo 重写历史的最后窗口，之后强推会分裂所有克隆；(2) 工作区有未提交改动时（i18n 新模块）公开仓库，远端代码会引用不存在的文件而编译不过——公开前必须先构建验证再提交
+
+- [x] 多语言支持 i18n：简体中文 + 英文，按系统语言自动切换（2026-09-23，v0.3.0，D007/D008）— 前端 i18next + react-i18next（`src/i18n/`，字典 `locales/zh-CN.json`/`en.json` 约 100 键），语言偏好存 settings.json `language` 键（auto/zh-CN/en），列表页工具栏新增语言下拉；后端新增 `sys-locale` + `src-tauri/src/i18n.rs` 查表（约 23 条错误文案），`get_system_locale`/`set_language` 两个新命令做前后端语言同步。⚠ 踩坑：(1) sys-locale 返回的 locale 分隔符可能是 `_`（如 zh_Hans_CN），匹配前必须归一为 `-` 再前缀匹配；(2) 后端错误经 `Result<_, String>` 原样透传到 toast，前端字典翻译不了它——后端必须同样 i18n，且前端在启动与手动切换时都要调 `set_language`，否则后端文案停留在系统语言；(3) 字典资源内联时 i18next init 同步完成，但偏好读取 + locale 探测是异步的，main.tsx 改为 `initLanguage().finally(render)` 先定语言再渲染，避免首帧闪烁；版本号这次三处同步（tauri.conf.json / package.json / Cargo.toml）
 
 - [x] 服务删除 + 备份恢复 + 备份管理页（2026-09-23，v0.2.0，D006）— 列表页/详情页新增「删除」：已加载服务先 bootout + `wait_until_state` 收敛，复制 plist + meta.json 到 `~/Library/Application Support/SysServiceHelper/backups/<epoch_ms>-<label>/`，再删原文件（/Library 走 osascript 提权 `rm -f`，~/Library 直接 `fs::remove_file`）；新增「备份管理」页（`BackupManager`，列表页右上入口）支持恢复/单条删除/一键清空，全部走确认弹窗；新增自研 `ConfirmModal` 组件（项目首个弹窗组件）。⚠ 踩坑：(1) /System/Library 服务受 SIP 保护，连 root 也删不掉，必须前端禁用 + 后端拦截双重防护；(2) 备份必须「先复制成功才允许删原文件」，备份半成品（复制/meta 写入失败）要回滚删掉子目录；(3) 恢复到 /Library 的 plist 必须提权 `cp`（保持 root 属主与常规 LaunchDaemon 一致），恢复前若同名服务已加载要先 bootout，否则覆盖运行中服务的 plist；(4) 备份 id 即子目录名，读写前必须校验拒绝 `/`、`..`（路径穿越）
 

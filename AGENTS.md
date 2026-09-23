@@ -12,7 +12,7 @@
 
 ## 代码约定
 
-- UI 文案与代码注释用中文。
+- UI 文案经 i18n 维护：组件里只写 `t()` 键，新增文案必须同步补 `src/i18n/locales/zh-CN.json` 与 `en.json` 两份字典；后端用户可见文案在 `src-tauri/src/i18n.rs` 查表。语言只支持简体中文与英文，其它系统语言回退英文。代码注释仍用中文。
 - 平台相关逻辑只写在 Rust 侧后端实现里（`src-tauri/src/`）；前端不直接接触平台 API。
 - 发版递增版本号时，`src-tauri/tauri.conf.json` 与 `package.json` 两处 `version` 必须同步改。
 

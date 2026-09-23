@@ -15,3 +15,6 @@
 | D004 | 分发链路：tauri build 后 ad-hoc 重签（`--force --deep --sign -`）+ `codesign --verify` 自检 + `ditto` 打 zip，目标机 `xattr -cr` 放行 | 不做公证（无付费开发者账号）；分发脚本必须自带签名校验，失败即退出 | 2026-09-01 |
 | D005 | 只出 Apple Silicon（arm64）单架构包，不做 universal | 支持 Intel 时再显式加 `--target universal-apple-darwin`（需先 rustup 加 target） | 2026-09-01 |
 | D006 | 服务删除 = 先备份后删除：备份存 `~/Library/Application Support/SysServiceHelper/backups/<epoch_ms>-<label>/`（plist 副本 + meta.json），恢复只还原 plist 文件不自动加载启动，备份完全手动管理（恢复/单删/清空），不自动清理 | 先复制备份成功才允许删原文件；/System/Library 服务受 SIP 保护一律拒绝删除（前端禁用 + 后端拦截）；system 域文件操作沿用 osascript 提权路径 | 2026-09-23 |
+| D007 | i18n：前端用 i18next + react-i18next（资源 JSON 内联打包）；语言偏好存 plugin-store `settings.json` 的 `language` 键（auto/zh-CN/en，默认 auto=经 `get_system_locale` 命令探测系统语言）；列表页提供手动切换。系统 locale 仅简体中文（zh-Hans*/zh-CN/zh-SG）映射中文，其余一律英文 | 两份字典（zh-CN/en）必须同步维护；缺失键回退英文；检测/偏好持久化失败都不阻塞 UI（回退 auto→英文） | 2026-09-23 |
+| D008 | 后端用户可见错误文案（约 23 条）在 Rust 侧查表翻译（`src-tauri/src/i18n.rs`，模块级语言由前端启动/切换时调 `set_language` 命令同步），不引入错误码协议、不改 `ServiceBackend` trait 签名 | launchctl/osascript 的原始 stderr 与 `raw_print` 输出是外部工具结果，保持原文不翻译；该规模下错误码改造成本不成比例 | 2026-09-23 |
+| D009 | 项目以 MIT License 开源（GitHub 仓库 public）；提交作者邮箱保留现状不重写历史；README 采用英文主文档 + `README.zh-CN.md` 双语结构 | 开源不可无 LICENSE（默认保留所有权利）；不为隐私顾虑改写 git 历史（哈希全变、协作成本不成比例） | 2026-09-23 |
