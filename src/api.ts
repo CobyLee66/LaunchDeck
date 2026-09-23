@@ -19,6 +19,15 @@ export interface ServiceDetail {
   raw_print: string;
 }
 
+export interface BackupInfo {
+  id: string;
+  label: string;
+  domain: string; // "system" | "gui" | "user"
+  original_path: string;
+  deleted_at_ms: number;
+  file_name: string;
+}
+
 export function listServices(): Promise<ServiceInfo[]> {
   return invoke<ServiceInfo[]>("list_services");
 }
@@ -37,4 +46,24 @@ export function stopService(domain: string, label: string): Promise<void> {
 
 export function restartService(domain: string, label: string, plistPath: string | null): Promise<void> {
   return invoke("restart_service", { domain, label, plistPath });
+}
+
+export function deleteService(domain: string, label: string, plistPath: string): Promise<void> {
+  return invoke("delete_service", { domain, label, plistPath });
+}
+
+export function listBackups(): Promise<BackupInfo[]> {
+  return invoke<BackupInfo[]>("list_backups");
+}
+
+export function restoreBackup(backupId: string): Promise<void> {
+  return invoke("restore_backup", { backupId });
+}
+
+export function deleteBackup(backupId: string): Promise<void> {
+  return invoke("delete_backup", { backupId });
+}
+
+export function clearBackups(): Promise<void> {
+  return invoke("clear_backups");
 }

@@ -14,3 +14,4 @@
 | D003 | 服务运行态一律实时经 `launchctl print <domain>` 获取并解析，不维护本地状态缓存 | plist 目录只做静态扫描；运行状态以 launchctl 输出为准 | 2026-09-01 |
 | D004 | 分发链路：tauri build 后 ad-hoc 重签（`--force --deep --sign -`）+ `codesign --verify` 自检 + `ditto` 打 zip，目标机 `xattr -cr` 放行 | 不做公证（无付费开发者账号）；分发脚本必须自带签名校验，失败即退出 | 2026-09-01 |
 | D005 | 只出 Apple Silicon（arm64）单架构包，不做 universal | 支持 Intel 时再显式加 `--target universal-apple-darwin`（需先 rustup 加 target） | 2026-09-01 |
+| D006 | 服务删除 = 先备份后删除：备份存 `~/Library/Application Support/SysServiceHelper/backups/<epoch_ms>-<label>/`（plist 副本 + meta.json），恢复只还原 plist 文件不自动加载启动，备份完全手动管理（恢复/单删/清空），不自动清理 | 先复制备份成功才允许删原文件；/System/Library 服务受 SIP 保护一律拒绝删除（前端禁用 + 后端拦截）；system 域文件操作沿用 osascript 提权路径 | 2026-09-23 |

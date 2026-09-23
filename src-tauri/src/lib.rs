@@ -13,6 +13,11 @@ pub fn run() {
             commands::start_service,
             commands::stop_service,
             commands::restart_service,
+            commands::delete_service,
+            commands::list_backups,
+            commands::restore_backup,
+            commands::delete_backup,
+            commands::clear_backups,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -6,22 +6,26 @@ import {
   startService,
   stopService,
   restartService,
+  deleteService,
 } from "../api";
 import FilterBar, { Filters } from "./FilterBar";
+import ConfirmModal from "./ConfirmModal";
 
 const STORE_KEY = "favorites";
 
 interface Props {
   onOpenDetail: (s: ServiceInfo) => void;
+  onOpenBackups: () => void;
 }
 
-export default function ServiceList({ onOpenDetail }: Props) {
+export default function ServiceList({ onOpenDetail, onOpenBackups }: Props) {
   const [services, setServices] = useState<ServiceInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [busy, setBusy] = useState<string | null>(null); // `${domain}/${label}`
   const [toast, setToast] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
+  const [confirmDel, setConfirmDel] = useState<ServiceInfo | null>(null);
   const [filters, setFilters] = useState<Filters>({
     search: "",
     source: "thirdparty",
@@ -80,8 +84,27 @@ export default function ServiceList({ onOpenDetail }: Props) {
       else await restartService(s.domain, s.label, s.plist_path);
       showToast("ok", `${action} ${s.label} 成功`);
       refresh();
+      // 兜底：极端情况下 launchd 状态收敛可能超过后端等待上限，延迟再补偿刷新一次
+      window.setTimeout(refresh, 3000);
     } catch (e) {
       showToast("err", `${action} ${s.label} 失败: ${e}`);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const doDelete = async (s: ServiceInfo) => {
+    const key = `${s.domain}/${s.label}`;
+    setConfirmDel(null);
+    setBusy(key);
+    try {
+      await deleteService(s.domain, s.label, s.plist_path!);
+      showToast("ok", `已删除 ${s.label}（已备份，可在「备份管理」中恢复）`);
+      refresh();
+      // 兜底：极端情况下 launchd 状态收敛可能超过后端等待上限，延迟再补偿刷新一次
+      window.setTimeout(refresh, 3000);
+    } catch (e) {
+      showToast("err", `删除 ${s.label} 失败: ${e}`);
     } finally {
       setBusy(null);
     }
@@ -113,7 +136,12 @@ export default function ServiceList({ onOpenDetail }: Props) {
 
   return (
     <div className="page">
-      <h1>Launchd 服务管理</h1>
+      <div className="page-head">
+        <h1>Launchd 服务管理</h1>
+        <button className="btn" onClick={onOpenBackups}>
+          备份管理
+        </button>
+      </div>
       <FilterBar filters={filters} onChange={setFilters} onRefresh={refresh} loading={loading} />
       {toast && <div className={`toast ${toast.kind}`}>{toast.text}</div>}
       {error && <div className="toast err">加载失败: {error}</div>}
@@ -126,7 +154,7 @@ export default function ServiceList({ onOpenDetail }: Props) {
               <th style={{ width: 120 }}>状态</th>
               <th style={{ width: 70 }}>自动运行</th>
               <th style={{ width: 60 }}>域</th>
-              <th style={{ width: 230 }}>操作</th>
+              <th style={{ width: 300 }}>操作</th>
             </tr>
           </thead>
           <tbody>
@@ -167,6 +195,20 @@ export default function ServiceList({ onOpenDetail }: Props) {
                       <button className="btn" onClick={() => onOpenDetail(s)}>
                         详情
                       </button>
+                      <button
+                        className="btn danger"
+                        disabled={isBusy || s.is_system || !s.plist_path}
+                        title={
+                          s.is_system
+                            ? "系统自带服务受 SIP 保护，不可删除"
+                            : s.plist_path
+                              ? "删除并备份此服务"
+                              : "未找到 plist 文件，无法删除"
+                        }
+                        onClick={() => setConfirmDel(s)}
+                      >
+                        删除
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -185,6 +227,16 @@ export default function ServiceList({ onOpenDetail }: Props) {
       <div className="footer">
         {loading ? "加载中…" : `共 ${visible.length} / ${services.length} 个服务`}
       </div>
+      {confirmDel && (
+        <ConfirmModal
+          title="删除服务"
+          message={`确定删除服务 ${confirmDel.label} 吗？\n将停止服务并把 ${confirmDel.plist_path} 备份到本机，之后可在「备份管理」中恢复。`}
+          confirmText="删除"
+          danger
+          onConfirm={() => doDelete(confirmDel)}
+          onCancel={() => setConfirmDel(null)}
+        />
+      )}
     </div>
   );
 }

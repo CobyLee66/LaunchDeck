@@ -1,8 +1,12 @@
 import { useCallback, useState } from "react";
 import ServiceList from "./components/ServiceList";
 import ServiceDetail from "./components/ServiceDetail";
+import BackupManager from "./components/BackupManager";
 
-export type View = { kind: "list" } | { kind: "detail"; domain: string; label: string };
+export type View =
+  | { kind: "list" }
+  | { kind: "detail"; domain: string; label: string }
+  | { kind: "backups" };
 
 export default function App() {
   const [view, setView] = useState<View>({ kind: "list" });
@@ -15,6 +19,14 @@ export default function App() {
         <ServiceList
           key={reloadTick}
           onOpenDetail={(s) => setView({ kind: "detail", domain: s.domain, label: s.label })}
+          onOpenBackups={() => setView({ kind: "backups" })}
+        />
+      ) : view.kind === "backups" ? (
+        <BackupManager
+          onBack={() => {
+            reload();
+            setView({ kind: "list" });
+          }}
         />
       ) : (
         <ServiceDetail

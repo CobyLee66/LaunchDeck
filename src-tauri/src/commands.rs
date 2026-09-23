@@ -1,4 +1,4 @@
-use crate::models::{ServiceDetail, ServiceInfo};
+use crate::models::{BackupInfo, ServiceDetail, ServiceInfo};
 use crate::service::{default_backend, ServiceBackend};
 use std::sync::OnceLock;
 
@@ -38,4 +38,29 @@ pub fn restart_service(
     plist_path: Option<String>,
 ) -> Result<(), String> {
     backend().restart(&domain, &label, plist_path.as_deref())
+}
+
+#[tauri::command]
+pub fn delete_service(domain: String, label: String, plist_path: String) -> Result<(), String> {
+    backend().delete_service(&domain, &label, &plist_path)
+}
+
+#[tauri::command]
+pub fn list_backups() -> Result<Vec<BackupInfo>, String> {
+    backend().list_backups()
+}
+
+#[tauri::command]
+pub fn restore_backup(backup_id: String) -> Result<(), String> {
+    backend().restore_backup(&backup_id)
+}
+
+#[tauri::command]
+pub fn delete_backup(backup_id: String) -> Result<(), String> {
+    backend().delete_backup(&backup_id)
+}
+
+#[tauri::command]
+pub fn clear_backups() -> Result<(), String> {
+    backend().clear_backups()
 }
